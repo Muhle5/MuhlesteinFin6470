@@ -1,0 +1,82 @@
+---
+title: "Fin6470_Ch05"
+subtitle: "Seth Muhlestein"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+###5.1 
+
+Description             Receive at Time  Give at Time  Payment
+----------------------  ---------------  ------------  -----------------------
+Outright Sale                 0               0        $S_0$ at $t_0$
+Loan/Security Sale            T               0        $S_0$$e^{rT}$ at time T
+Prepaid Forward               0               T        ?
+Forward                       T               T        ? x $e^{rT}$
+
+###5.2 
+$$ a) 50-[(1e^{-.0151})+(1e^{-.0152})+(1e^{-.0153})+(1e^{-.0154})] = 46.15 $$
+$$ b) 46.15e^{.061} = 49.00 $$
+
+###5.3
+
+$$a) 50e^{-.081} = 46.16 $$ $$ b)50*e^{(.06-.08)*1} = 49.01 $$
+
+###5.4
+
+$$ a) 35e^{.05.5} = 35.89 $$ 
+$$ b) \frac{1}{.5}ln \frac{35.50}{35} = .028 $$ 
+$$ c) 35.5 = 35e^{(.02-\delta)*.5} = .0216 $$
+
+###5.6
+
+$$ a) 1100e^{(.05-.015).75} = 1129.26 $$ 
+
+b) To hedge, I would enter into a short sale of the index and go long a forward position.
+
+c) To hedge, I would buy the underlying asset to offset the sale of the index and then sell the asset forward.
+
+###5.7
+
+a) The no arbitrage price should be $1127.85. With an observed price of $1135, I would go long the underlying and sell the forward.
+b) The no arbitrage price should be $1127.85. With an observed price of $1115, I would short the underlying and buy the forward.
+
+###5.8
+
+a) The no arbitrage price should be $1116.62. With an observed price of $1120, I would long the underlying and sell the forward.
+b) The no arbitrage price should be $1116.62. so if the observed price is $1110, I would short the underlying and buy the forward.
+
+###5.9
+
+a) The money manager could go back in time and purchase the t-bill and hold it to make the yield difference. 
+Or, the manager could sell forward contracts to purchase at a high yield in one year. With yields decreasing, the manager would be in a buy low sell high environment
+in 1982.
+b) Interest rates would have to start declining to eliminate the arbitrage opportunity.
+c) Arbitrage will drive some mad scientist to discover time travel so that he can intertemporally skewer the market. Arbitrage is a great motivator ;)
+
+###5.11
+
+$$ a) 12002504 = 1,200,000 $$ $$ b) 1,200,000*.1 = 120,000 $$
+
+###5.15
+
+$$ a) F^+ = 800e^{.0551} = 845.23 $$ 
+$$ a) F^- = 800e^{.051} = 841.02 $$ 
+$$ b) F^+ = (800 + 1) e^{.0551} = 846.29 $$ 
+$$ b) F^- = (800 - 1)e^{.051} = 839.97 $$ 
+$$ c) F^+ = (800+1+2.4)e^{.0551}=848.82 $$ 
+$$ c) F^- = (800-1-2.4)e^{.051}=837.44 $$ 
+$$ d) F^+ = (800+2.4+1)e^{.0551} +2.4 = 851.22 $$ 
+$$ d) F^- = (800-2.4-1)e^{.051} -2.4 = 835.04 $$ 
+$$ e) F^+ = (800+2)(800*.003)+1e^{.0551}= 851.36 $$ 
+$$ e) F^- = (800-2)(800*.003)-1e^{.051}=834.92 $$
+
+###5.16
+
+$$ a) 875e^{.04751} = 917.57 $$
+
+$$ b) contracts= \frac{800,000}{218,750}*1.1=4.023 $$
+
+b) Each future has a value of $218,750 (250 x 875). We could cover our exposure by purchasing futures contracts.We'd purchase 800,000 / 218,750 = 3.65714. We have to adjust for beta, so we get 1.1*3.65714 = 4.023. After the adjustment we purchase 4.023 contracts. We would earn the risk free rate over the next year with this hedged position.

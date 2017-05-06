@@ -1,0 +1,182 @@
+---
+title: "Fin6470_Midterm"
+subtitle: "Seth Muhlestein"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+####Question 1
+
+a) If $F_0$ > $S_0$$e^{rT}$ then there would be an arbitrage opportunity. We would buy the spot price of the given commodity
+
+b) If $F_0$ < $S_0e^{rT}$ then we would buy the futures contract of the commodity.
+
+c) If we have a discrete dividends the equation turns into $F_0$ = $S_0e^{rT} \sum_{i=1}^{n}D_{t_i} e^{r(T-t_i)}$ Where:
+
+$D_{t_i}$ = the discrete dividend
+$t_i$ = the period the dividend is received
+T = Time to maturity in years
+d) $F_0 = (S_0 + U)e^{rT}$ - Where U is the fixed storage cost $F_0 = S_0e^{(r + U)T}$ - Where U is the storage cost as a percentage
+
+e) The reason that futures prices converge with spot at maturity is because of arbitrage. If the futures price is above the spot as we get closer to maturity the arbitrageurs will short the futures and buy the underlying asset driving the futures price down until $F_0 = S_0$. The opposite is also true if the spot is above the future then arbitrageurs will go long on futures and short the underlying asset.
+
+f) When pricing a prepaid forward you need to account for the loss of dividend payments so the formula for pricing a prepaid forward should be $F_{0}^{P} = S_0 - D_{t_i}e^{-rT}$. An example of using a prepaid forward would be to defer taxes. So, investors receive cash now and pay taxes when the goods are delivered.
+
+####Question 2
+##### Number 1 Augmented Dickey Fuller Test for unit roots
+
+
+dairy <- read.csv("dairy.csv", header=T)
+head(raw.data)
+
+library(urca)
+
+spotdl = dairy$DL.Nearest.Settlement
+spotbj = dairy$BJ.Nearest.Settlement
+spotdl.diff = diff(spotdl)
+spotbj.diff = diff(spotbj)
+ln.spotdl = log(dairy$DL.Nearest.Settlement)
+ln.spotbj = log(dairy$BJ.Nearest.Settlement)
+ln.spotdl.diff = diff(ln.spotdl)
+ln.spotbj.diff = diff(ln.spotbj)
+
+adf.spotdl <- ur.df(y=spotdl, type = "drift", selectlags = "BIC")
+summary(adf.spotdl)
+
+adf.spotbj <- ur.df(y=spotbj, type = "drift", selectlags  = "BIC")
+summary(adf.spotbj)
+
+adf.spotdl.diff <- ur.df(y=spotdl.diff, type = "drift", selectlags = "BIC")
+summary(adf.spotdl.diff)
+
+adf.spotbj.diff <- ur.df(y=spotbj.diff, type = "drift", selectlags = "BIC")
+summary(adf.spotbj.diff)
+
+adf.lnsdl <- ur.df(y=ln.spotdl, type = "drift", selectlags = "BIC")
+summary(adf.lnsdl)
+
+adf.lnsbj <- ur.df(y=ln.spotbj, type = "drift", selectlags = "BIC")
+summary(adf.lnsbj)
+
+adf.logsdl.diff <- ur.df(y=ln.spotdl.diff, type = "drift", selectlags = "BIC")
+summary(adf.logsdl.diff)
+
+adf.logsbj.diff <- ur.df(y=ln.spotbj.diff, type = "drift", selectlags = "BIC")
+summary(adf.logsbj.diff)
+
+
+dlspotgraph = plot(spotdl, ylab = "DL Spot Price", xlab = "Time")
+bjspotgraph = plot(spotbj, ylab = "BJ Spot Price", xlab = "Time" )
+lndlspotgraph = plot(ln.spotdl, ylab = "log(DL) Spot Price", xlab = "Time")
+lnbjspotgraph = plot (ln.spotbj, ylab = "Log(BJ Spot Price", xlab = "Time")
+dldiffgraph = plot(spotdl.diff, ylab = "DL Spot Price Difference", xlab = "Time")
+bjdiffgraph = plot(spotbj.diff, ylab = "BJ Spot Price Difference", xlab = "Time")
+lndldiffgraph = plot(ln.spotdl.diff, ylab = "Log(DL) Spot Price Difference" , xlab = "Time")
+lnbjdiffgraph = plot(ln.spotbj.diff, ylab = "Log(BJ) Spot Price Difference", xlab = "Time")
+
+
+
+#### C Engle Granger 
+
+fit <- lm(ln.spotdl ~ ln.spotbj)
+summary(fit)
+
+resid <- fit$residuals
+plot(resid, type = "b", lwd = 3, col = "blue", main = "Engle-Granger Step 1 Residuals")
+
+adf.resid <- ur.df(resid, type = "drift", selectlags = "BIC")
+summary(adf.resid)
+
+**a) The Cointegrated vector is [1,1.217]** 
+
+**b) The F-stat shows that we have stationarity at a 95 percent confidence level.** 
+
+####Problem D
+
+vol.dlspot <- sd(ln.spotdl)
+vol.bjspot <- sd(ln.spotbj)
+
+rho <- cor(ln.spotdl, ln.spotbj)
+
+h.star <- rho * (vol.dlspot / vol.bjspot)
+h.star
+
+####Question 3
+
+alpha_oil <-  0.342
+beta_oil <-  .539
+sigma_oil <-  .11
+S_oil_0 <- .69
+nreps <-  45
+b2 <-  -.01
+b1 <-  -.02
+
+alpha_heat <-  0.391
+beta_heat <-  0.560
+sigma_heat <-  0.116
+S_heat_0 <-  0.80
+rho <-  0.705
+
+ln_S_oil <-  rep(0,nreps)
+ln_S_oil[1] <-  log(S_oil_0)
+ln_S_heat <-  rep(0,nreps)
+ln_S_heat[1] <-  log(S_heat_0)
+
+z1 <-  rnorm(nreps)
+
+for (t in 2:nreps)
+{
+  
+  ln_S_oil[t] <-  ln_S_oil[t-1] + alpha_oil * (beta_oil-exp(S_oil_0[t-1])) + z1[t]*sigma_oil
+  
+  ln_S_heat[t] <- ln_S_heat[t-1] + alpha_heat * (beta_heat-exp(S_heat_0[t-1])) + z1[t]*sigma_heat
+
+  b1[t] <-  alpha_oil * b1[t-1] + beta_oil * S_oil_0[t] + rnorm(1,0)
+  
+  beta_heat[t] <-  alpha_heat * b2[t-1] + beta_heat * S_heat_0[t] + rnorm(1,0)
+}
+
+ln.S.oil
+
+####Question 4
+
+The main difference between forwards and futures is that futures are exchange-traded. That means the contracts are standardized. A future contract for grain will always look like a future contract for grain. Forwards, on the other hand, are over-the-counter (OTC) instruments. That means each contract must be negotiated and that its terms may vary.
+
+Forwards provide extra flexibility for those involved. However, futures evolved to solve several problems that forwards face. The first problem I think of is counterparty risk. A forward is strictly negotiated between two parties. Should one party renege, the other will be out of luck. A future is traded on an exchange which provides insurance in the case of a default. Trades are settled daily with the use of margin accounts; each participant must post margin if the trade falls to far out of his favor.
+
+The other major benefit that futures provide that forwards do not is liquidity. The standardized nature of the contract allows a trade participant to close out, or exit, a transaction by purchasing the opposite side of a trade that he is involved in. Because the exchange limits counterparty risk, knowing your counterparty becomes less important-if not mute.
+
+The evolution of forwards and futures stems from a simple but omnipresent issue: uncertainty. Farmers, manufacturers, and raw material producers face immense price uncertainty. To provide certainty, futures and forwards were formed to lock in a specific price for the future, eliminating that risk. Another service that forwards and futures provide is that of information accumulation. Expectations can be expressed through monetary trades which inform the market-and those watching-of likely outcomes.
+
+####Question 5
+
+a)	Liu used a cointegration model to show the co-movement between hog, soybean meal, and corn futures. The cointegrating vector was (1, -.083, -.00099) for hogs, soybean, and corn respectively. This shows that by taking short and long positions in these futures, you can basically replicate the raising of hogs. You can be a pig farmer without ever stepping in their poop (I wanted to use more colorful language but.). Liu used a statistical method called the Perron unit root test to look for stationarity (order 1 [I(1)].) This test allows for a time break correlated with the data. He also uses a three-dimensional vector auto regression. These tests allowed him to find stationarity and more fully tease out directional causality. This is important given that the past does not always reflect the future (or the future doesn't always); a regime change or some other stochastic jump would not skew the model as much with the Perron test. The VAR allows to tease out the question of whether changes in soy bean meal futures prices cause hog futures prices to change or vice-versa.
+
+b)	I think that what we see is a bounded equilibrium process. There are deviations from the mean, but prices always seem to revert toward the mean. That fits into the Neo-Austrian view of the market because true equilibrium is there but not always found. The market is constantly in an equilibrium process. New information is incorporated and deviations occur without drift.
+
+c)	Liu uses four points, 0.25, 0.5, 0.75, and a movement measure of one standard deviation away from the mean. The idea is that anytime a market movement exceeded a single standard deviation move, a trader should take the opposite position and bet on a return to the mean. I would have been happy to put money on this trade.before it was published. Now that it is out there, I would expect the market to correct too quickly for me to be able to enter into the trade. 
+
+####Question 6
+
+a) 	Metallgesellschaft (MG) basically sold futures for 5 and 10 year delivery. The idea was that MG would lock in a spread on each barrel of oil it sold. For every physical barrel it would deliver, it would enter into a hedge. They used a one-for-one strategy. However, since the futures market has mostly short-dated futures, MG would purchase a short-term future for every long term barrel. This is a stacked hedge as they would roll-over each month to new futures contracts to replace the ones that expired. Unlike minimum variance hedging, MG was not trying to eliminate all risk. They were using their comparative advantage in oil delivery to lock in a spread, which worked as long as the market remained in backwardation which is more common for the oil market.
+
+b)	Pirrong defines hedging as purely minimum variance hedging (MVH). While MVH is the widely accepted and practiced hedging strategy, it's not the only way to hedge. As discussed above, MG entered into a one-for-one stacked hedge to lock in a spread. So while they hedged, it wasn't meant to be variance minimizing. Using MG's losses as evidence of a failed trading strategy, Pirrong blasts MG for not using the MVH. The hedge ratio that Pirrong suggests is closer to .5 than 1.
+
+c) 	Pirrong comments on Bayes' rule as a way to show that even if you thought another hedging strategy would be better, you could only put a small weight on that possibility because it relies on MG having and informational comparative advantage. However, even invoking Bayes' rule shows that Pirrong could be open to another hedge ratio that wasn't MVH if you truly did possess some informational advantage.
+
+d) 	Contango wreaks havoc on this strategy because it appears that you are losing money. The basis spread that MG locked in relied on a market in backwardation. Once the market entered contango, MG had to rely on cash reserves to make margin payments. However, had MG held on, they would have made it back in the futures market. In essence, the contango market caused people to freak out and turn paper losses into actual losses. Had MG been able to simply finance the trade, they would have come out on top as the market did revert back to backwardation. 
+
+####Question 7
+
+Hayek focuses on prices as a way to signal and aggregate information. The idea is that small local bits of knowledge can get passed on to the market. It also means that other actors in the market don't have to rely on their own ideas. They can see changes in prices and know that something has happened to change them. Richard Roll's paper fits right into this theme. He talks about how the original idea was that weather patterns and predictions should give some indication of movement in the futures market. What he finds, however, is that movement in the futures market predicted the weather; it did so more accurately than meteorologists at the time the paper was written. It's the perfect example of the old farmer in Florida feeling a creak in his bones and buying futures to offset the weather he feels in his bones. 
+
+The paper "Is Sound Just Noise" is another example of the many possible avenues for information to aggregate in the market. Roll studied the level of ambient noise in a trading pit. As noise levels increased, that signaled that more economic activity was occurring. With this increase, the volatility for prices also increased. I think that this paper is a good example of the unlikelihood of the "Auctioneer" that sets prices. Information comes in many forms-like the "soft" information in earnings conference calls-just like noise in a trading pit.
+
+####Question 9
+
+The fact that people now trade on the weather is pretty astonishing to me. It seems like an abstract thing, but it allows for the aggregation of more information. I think that we could use futures to improve current markets such as the insurance and warranty arenas. Right now the insurance company determines how risky I am and then charges me accordingly. What if I could just buy a future contract on the likelihood of my crashing. If I don't crash, I get paid. If I do, I'm on the hook for the damages. This would allow people to pay for the amount of risk they are willing to take on. They could choose how much of their idiocy (or just bad luck) they want to hedge away. A warranty could be the same thing. Think of the number of miles as the delivery point. If I can "deliver" my car after $100,000 miles in a certain condition, why shouldn't I be able to trade on that? 
+
+Another market that could be expanded is the housing market. The big banks were able to enter into credit default swaps; I think a consumer market could be made where that CDS protects home owners from adverse market swings.
